@@ -1,40 +1,92 @@
 @import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* Dark mode follows the data-theme attribute set by useTheme (light/dark/system). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
- * Design tokens. Phase 2 expands this into the full design system (surfaces,
- * borders, accent scale, typography, motion). Colours are CSS variables so
- * light/dark/system themes and the accent colour switch without re-rendering.
+ * Design tokens. Neutral surfaces, one accent, semantic status colours.
+ * Components use the Tailwind names below (bg-panel, text-muted, …), never
+ * raw colours, so themes switch without touching components.
  */
 :root {
-  color-scheme: light dark;
-  --lm-bg: #f7f7f8;
-  --lm-surface: #ffffff;
+  --lm-bg: #f6f6f7;
+  --lm-panel: #ffffff;
+  --lm-panel-2: #f4f4f5;
+  --lm-hover: #f0f0f2;
+  --lm-active: #eaeaf7;
   --lm-border: #e4e4e7;
-  --lm-text: #18181b;
-  --lm-text-muted: #71717a;
+  --lm-border-strong: #d4d4d8;
+  --lm-fg: #18181b;
+  --lm-muted: #6b6b76;
+  --lm-faint: #a1a1aa;
   --lm-accent: #4f46e5;
+  --lm-accent-hover: #4338ca;
+  --lm-accent-fg: #ffffff;
+  --lm-accent-soft: #eef0ff;
+  --lm-success: #16a34a;
+  --lm-success-soft: #e9f9ef;
+  --lm-warning: #d97706;
+  --lm-warning-soft: #fff6e5;
+  --lm-danger: #dc2626;
+  --lm-danger-soft: #fdeeee;
+  --lm-code-bg: #fafafa;
+  --lm-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.06);
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --lm-bg: #111318;
-    --lm-surface: #171a21;
-    --lm-border: #262a33;
-    --lm-text: #e4e4e7;
-    --lm-text-muted: #8b8f98;
-    --lm-accent: #818cf8;
-  }
+[data-theme="dark"] {
+  --lm-bg: #0e0f13;
+  --lm-panel: #15171c;
+  --lm-panel-2: #1b1d23;
+  --lm-hover: #1e2128;
+  --lm-active: #23253a;
+  --lm-border: #24272f;
+  --lm-border-strong: #31353f;
+  --lm-fg: #e6e6ea;
+  --lm-muted: #9297a3;
+  --lm-faint: #5c616c;
+  --lm-accent: #7c83ff;
+  --lm-accent-hover: #959bff;
+  --lm-accent-fg: #0e0f13;
+  --lm-accent-soft: #1f2140;
+  --lm-success: #34d399;
+  --lm-success-soft: #10291f;
+  --lm-warning: #fbbf24;
+  --lm-warning-soft: #2b2310;
+  --lm-danger: #f87171;
+  --lm-danger-soft: #2e1515;
+  --lm-code-bg: #111318;
+  --lm-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-bg: var(--lm-bg);
-  --color-surface: var(--lm-surface);
+  --color-panel: var(--lm-panel);
+  --color-panel-2: var(--lm-panel-2);
+  --color-hover: var(--lm-hover);
+  --color-active: var(--lm-active);
   --color-border: var(--lm-border);
-  --color-fg: var(--lm-text);
-  --color-muted: var(--lm-text-muted);
+  --color-border-strong: var(--lm-border-strong);
+  --color-fg: var(--lm-fg);
+  --color-muted: var(--lm-muted);
+  --color-faint: var(--lm-faint);
   --color-accent: var(--lm-accent);
-  --font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  --color-accent-hover: var(--lm-accent-hover);
+  --color-accent-fg: var(--lm-accent-fg);
+  --color-accent-soft: var(--lm-accent-soft);
+  --color-success: var(--lm-success);
+  --color-success-soft: var(--lm-success-soft);
+  --color-warning: var(--lm-warning);
+  --color-warning-soft: var(--lm-warning-soft);
+  --color-danger: var(--lm-danger);
+  --color-danger-soft: var(--lm-danger-soft);
+  --color-code: var(--lm-code-bg);
+  --shadow-pop: var(--lm-shadow);
+  --font-sans: "Inter Variable", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "Cascadia Code", Consolas, monospace;
 }
 
 html,
@@ -46,11 +98,55 @@ body,
 body {
   margin: 0;
   background: var(--lm-bg);
-  color: var(--lm-text);
+  color: var(--lm-fg);
   font-family: var(--font-sans);
   font-size: 13px;
+  line-height: 1.45;
+  font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
-  /* Desktop app: no rubber-band scrolling or text selection on chrome. */
   overscroll-behavior: none;
+  /* Desktop app: chrome is not selectable; content opts in with .select-text. */
   user-select: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lm-accent);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+/* Thin, theme-aware scrollbars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--lm-border-strong) transparent;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-border bg-panel px-3 text-[13px] font-medium text-fg transition-colors select-none hover:bg-hover disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply border-transparent bg-accent text-accent-fg hover:bg-accent-hover;
+  }
+  .btn-danger {
+    @apply border-transparent bg-danger text-white hover:opacity-90;
+  }
+  .btn-ghost {
+    @apply border-transparent bg-transparent hover:bg-hover;
+  }
+  .btn-icon {
+    @apply inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-hover hover:text-fg disabled:pointer-events-none disabled:opacity-40;
+  }
+  .input {
+    @apply h-8 w-full rounded-md border border-border bg-panel px-2.5 text-[13px] text-fg transition-colors outline-none placeholder:text-faint focus:border-accent focus:ring-2 focus:ring-accent/20;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium text-muted;
+  }
+  .card {
+    @apply rounded-lg border border-border bg-panel;
+  }
+  .kbd {
+    @apply rounded border border-border bg-panel-2 px-1 font-mono text-[10px] text-muted;
+  }
 }

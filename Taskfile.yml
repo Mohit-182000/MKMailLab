@@ -24,9 +24,11 @@ tasks:
       - task: windows:build
 
   package:
-    summary: Builds the NSIS installer (requires NSIS / makensis on PATH)
+    summary: Builds the per-user NSIS installer into bin/ (requires NSIS / makensis on PATH)
     cmds:
       - task: windows:package
+        vars:
+          INSTALL_SCOPE: user
 
   run:
     summary: Runs the built executable

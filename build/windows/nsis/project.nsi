@@ -54,7 +54,8 @@ ManifestDPIAware true
 !define MUI_ICON "..\icon.ico"
 !define MUI_UNICON "..\icon.ico"
 # !define MUI_WELCOMEFINISHPAGE_BITMAP "resources\leftimage.bmp" #Include this to add a bitmap on the left side of the Welcome Page. Must be a size of 164x314
-!define MUI_FINISHPAGE_NOAUTOCLOSE # Wait on the INSTFILES page so the user can take a look into the details of the installation steps
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}" # "Launch LocalMail" checkbox on the finish page
+!define MUI_FINISHPAGE_RUN_TEXT "Launch ${INFO_PRODUCTNAME}"
 !define MUI_ABORTWARNING # This will warn the user if they exit from the installer.
 
 !insertmacro MUI_PAGE_WELCOME # Welcome to the installer page.
@@ -72,13 +73,21 @@ ManifestDPIAware true
 #!finalize 'signtool --file "%1"'
 
 Name "${INFO_PRODUCTNAME}"
-OutFile "..\..\..\bin\${INFO_PROJECTNAME}-${ARCH}-installer.exe" # Name of the installer's file.
+OutFile "..\..\..\bin\${INFO_PRODUCTNAME}-Setup-${INFO_PRODUCTVERSION}.exe" # Name of the installer's file.
 !if "${WAILS_INSTALL_SCOPE}" == "user"
     InstallDir "$LOCALAPPDATA\Programs\${INFO_PRODUCTNAME}"
 !else
     InstallDir "$PROGRAMFILES64\${INFO_COMPANYNAME}\${INFO_PRODUCTNAME}"
 !endif
-ShowInstDetails show # This will always show the installation details.
+ShowInstDetails nevershow
+ShowUninstDetails nevershow
+
+# Closes a running LocalMail (gracefully first) so its files are not locked.
+!macro localmail.closeRunning
+    nsExec::Exec 'taskkill /IM "${PRODUCT_EXECUTABLE}"'
+    Sleep 1500
+    nsExec::Exec 'taskkill /F /IM "${PRODUCT_EXECUTABLE}"'
+!macroend
 
 Function .onInit
    !insertmacro wails.checkArchitecture
@@ -88,6 +97,8 @@ Section
     !insertmacro wails.setShellContext
 
     !insertmacro wails.webview2runtime
+
+    !insertmacro localmail.closeRunning
 
     SetOutPath $INSTDIR
     
@@ -104,6 +115,11 @@ SectionEnd
 
 Section "uninstall" 
     !insertmacro wails.setShellContext
+
+    !insertmacro localmail.closeRunning
+
+    # Captured emails and settings in %LOCALAPPDATA%\LocalMail are kept on
+    # purpose; delete that folder manually for a completely clean removal.
 
     RMDir /r "$AppData\${PRODUCT_EXECUTABLE}" # Remove the WebView2 DataPath
 

@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"flag"
 	"fmt"
@@ -89,7 +90,12 @@ func run() (code int) {
 		"version", brand.Version, "commit", brand.Commit, "dev", brand.Dev,
 		"data_dir", paths.Root, "portable", paths.Portable)
 
-	core := app.New(app.Options{Paths: paths, Logging: logs})
+	core, err := app.New(context.Background(), app.Options{Paths: paths, Logging: logs})
+	if err != nil {
+		log.Error("backend initialisation failed", "err", err)
+		platform.FatalDialog(brand.Name, fmt.Sprintf("%s could not open its database.\n\n%v\n\nLog file:\n%s", brand.Name, err, logs.File))
+		return 1
+	}
 
 	instanceID := brand.AppID
 	if brand.Dev {
@@ -119,6 +125,8 @@ func run() (code int) {
 			},
 		},
 	})
+
+	core.AttachEvents(func(name string, data any) { wailsApp.Event.Emit(name, data) })
 
 	mainWindow = wailsApp.Window.NewWithOptions(application.WebviewWindowOptions{
 		Name:             "main",
