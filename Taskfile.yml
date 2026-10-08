@@ -1,0 +1,71 @@
+version: '3'
+
+vars:
+  APP_NAME: "localmail"
+  BIN_DIR: "bin"
+  PACKAGE_MANAGER: '{{.PACKAGE_MANAGER | default "npm"}}'
+  VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
+  # LocalMail ships for Windows only; the Windows Taskfile is the build target.
+  GOOS: windows
+
+includes:
+  common: ./build/Taskfile.yml
+  windows: ./build/windows/Taskfile.yml
+
+tasks:
+  dev:
+    summary: Runs the application in development mode (hot reload)
+    cmds:
+      - wails3 dev -config ./build/config.yml -port {{.VITE_PORT}}
+
+  build:
+    summary: Builds the production executable into bin/
+    cmds:
+      - task: windows:build
+
+  package:
+    summary: Builds the NSIS installer (requires NSIS / makensis on PATH)
+    cmds:
+      - task: windows:package
+
+  run:
+    summary: Runs the built executable
+    cmds:
+      - task: windows:run
+
+  bindings:
+    summary: Regenerates the TypeScript bindings from Go services
+    cmds:
+      - task: common:generate:bindings
+
+  test:
+    summary: Runs all Go and frontend tests
+    cmds:
+      - task: test:go
+      - task: test:frontend
+
+  test:go:
+    summary: Runs Go tests for all backend packages
+    cmds:
+      - go test ./internal/... -count=1
+
+  test:frontend:
+    summary: Runs frontend unit tests
+    dir: frontend
+    deps:
+      - task: common:install:frontend:deps
+    cmds:
+      - npm test
+
+  lint:
+    summary: Static checks (gofmt, go vet, vue-tsc)
+    deps:
+      - task: common:build:frontend
+        vars:
+          DEV: "true"
+    cmds:
+      - cmd: gofmt -l internal main.go
+      - go vet ./...
+      - task: common:frontend:run
+        vars:
+          SCRIPT: typecheck

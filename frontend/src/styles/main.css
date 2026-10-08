@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Phase 2 expands this into the full design system (surfaces,
+ * borders, accent scale, typography, motion). Colours are CSS variables so
+ * light/dark/system themes and the accent colour switch without re-rendering.
+ */
+:root {
+  color-scheme: light dark;
+  --lm-bg: #f7f7f8;
+  --lm-surface: #ffffff;
+  --lm-border: #e4e4e7;
+  --lm-text: #18181b;
+  --lm-text-muted: #71717a;
+  --lm-accent: #4f46e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --lm-bg: #111318;
+    --lm-surface: #171a21;
+    --lm-border: #262a33;
+    --lm-text: #e4e4e7;
+    --lm-text-muted: #8b8f98;
+    --lm-accent: #818cf8;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--lm-bg);
+  --color-surface: var(--lm-surface);
+  --color-border: var(--lm-border);
+  --color-fg: var(--lm-text);
+  --color-muted: var(--lm-text-muted);
+  --color-accent: var(--lm-accent);
+  --font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--lm-bg);
+  color: var(--lm-text);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  /* Desktop app: no rubber-band scrolling or text selection on chrome. */
+  overscroll-behavior: none;
+  user-select: none;
+}
