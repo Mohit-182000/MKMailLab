@@ -1,6 +1,6 @@
 # Architecture
 
-LocalMail is a single Windows process: a Go backend and a Vue 3 UI rendered
+MKMailLab is a single Windows process: a Go backend and a Vue 3 UI rendered
 by WebView2 through Wails v3. There is no internal HTTP server. The UI calls
 Go through Wails bindings and receives Wails events. Email HTML and
 attachments are served by an in-process asset handler.
@@ -8,7 +8,7 @@ attachments are served by an in-process asset handler.
 ## Layers
 
 ```
-┌──────────────────────────── localmail.exe ────────────────────────────┐
+┌──────────────────────────── mkmaillab.exe ────────────────────────────┐
 │ WebView2 · Vue 3                                                       │
 │   views → Pinia stores → services/backend.ts → bindings / events       │
 │ ───────────────────────────────────────────────────────────────────── │
@@ -88,7 +88,7 @@ SMTP client ─► listener (limits, timeouts, AUTH)
             ─► DATA (size-capped stream)
             ─► ingest queue (bounded; back-pressure → 451)
             ─► mime.Parse (panic-safe; errors recorded, raw always kept)
-            ─► route to project (listener port / X-LocalMail-Project / AUTH user)
+            ─► route to project (listener port / X-MKMailLab-Project / AUTH user)
             ─► single SQLite transaction (emails, bodies, raw, recipients,
                headers, attachments, FTS)
             ─► "250 OK: queued as <id>"   (only after commit)
@@ -101,14 +101,14 @@ SMTP client ─► listener (limits, timeouts, AUTH)
 Resolved by `internal/config`:
 
 1. `--data-dir` override
-2. Portable mode, enabled by `localmail.portable` next to the exe → `.\data`
-3. `%LOCALAPPDATA%\LocalMail` (`LocalMail-Dev` for dev builds)
+2. Portable mode, enabled by `mkmaillab.portable` next to the exe → `.\data`
+3. `%LOCALAPPDATA%\MKMailLab` (`MKMailLab-Dev` for dev builds)
 
 ## Logging
 
 `internal/logging` creates one `slog.Logger` that fans out to:
 
-- `logs\localmail.log`: JSON lines, rotated at 10 MiB, 5 backups kept. A
+- `logs\mkmaillab.log`: JSON lines, rotated at 10 MiB, 5 backups kept. A
   record is never split across files.
 - an in-memory ring of 2,000 entries with live subscribers, which feeds the
   Diagnostics page

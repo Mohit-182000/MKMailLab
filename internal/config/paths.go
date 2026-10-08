@@ -1,6 +1,6 @@
-// Package config resolves where LocalMail keeps its data on disk.
+// Package config resolves where MKMailLab keeps its data on disk.
 //
-// Default (installed) mode stores everything under %LOCALAPPDATA%\LocalMail.
+// Default (installed) mode stores everything under %LOCALAPPDATA%\MKMailLab.
 // Local rather than Roaming AppData is deliberate: the mail database can grow
 // large and must not be synced by roaming profiles.
 //
@@ -17,7 +17,7 @@ import (
 	"localmail/internal/brand"
 )
 
-// Paths lists every location LocalMail reads from or writes to.
+// Paths lists every location MKMailLab reads from or writes to.
 type Paths struct {
 	Root     string // base data directory
 	Database string // SQLite database file

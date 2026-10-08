@@ -18,7 +18,7 @@ export const useAppStore = defineStore('app', () => {
       info.value = await backend.system.getAppInfo()
       state.value = 'ready'
     } catch (err) {
-      error.value = errorMessage(err, 'Could not reach the LocalMail backend')
+      error.value = errorMessage(err, 'Could not reach the MKMailLab backend')
       state.value = 'error'
     }
   }

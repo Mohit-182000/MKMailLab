@@ -19,11 +19,11 @@ Unicode true
 ####
 ## The following information is taken from the wails_tools.nsh file, but they can be overwritten here.
 ####
-## !define INFO_PROJECTNAME    "my-project" # Default "localmail"
-## !define INFO_COMPANYNAME    "My Company" # Default "LocalMail"
-## !define INFO_PRODUCTNAME    "My Product Name" # Default "LocalMail"
+## !define INFO_PROJECTNAME    "my-project" # Default "mkmaillab"
+## !define INFO_COMPANYNAME    "My Company" # Default "MKMailLab"
+## !define INFO_PRODUCTNAME    "My Product Name" # Default "MKMailLab"
 ## !define INFO_PRODUCTVERSION "1.0.0"     # Default "0.1.0"
-## !define INFO_COPYRIGHT      "(c) Now, My Company" # Default "(c) 2026 LocalMail"
+## !define INFO_COPYRIGHT      "(c) Now, My Company" # Default "(c) 2026 MKMailLab"
 ###
 ## !define PRODUCT_EXECUTABLE  "Application.exe"      # Default "${INFO_PROJECTNAME}.exe"
 ## !define UNINST_KEY_NAME     "UninstKeyInRegistry"  # Default "${INFO_COMPANYNAME}${INFO_PRODUCTNAME}"
@@ -54,7 +54,7 @@ ManifestDPIAware true
 !define MUI_ICON "..\icon.ico"
 !define MUI_UNICON "..\icon.ico"
 # !define MUI_WELCOMEFINISHPAGE_BITMAP "resources\leftimage.bmp" #Include this to add a bitmap on the left side of the Welcome Page. Must be a size of 164x314
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}" # "Launch LocalMail" checkbox on the finish page
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}" # "Launch MKMailLab" checkbox on the finish page
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${INFO_PRODUCTNAME}"
 !define MUI_ABORTWARNING # This will warn the user if they exit from the installer.
 
@@ -82,11 +82,23 @@ OutFile "..\..\..\bin\${INFO_PRODUCTNAME}-Setup-${INFO_PRODUCTVERSION}.exe" # Na
 ShowInstDetails nevershow
 ShowUninstDetails nevershow
 
-# Closes a running LocalMail (gracefully first) so its files are not locked.
-!macro localmail.closeRunning
+# Closes a running MKMailLab (gracefully first) so its files are not locked.
+!macro mkmaillab.closeRunning
     nsExec::Exec 'taskkill /IM "${PRODUCT_EXECUTABLE}"'
     Sleep 1500
     nsExec::Exec 'taskkill /F /IM "${PRODUCT_EXECUTABLE}"'
+!macroend
+
+# The app was previously called "LocalMail". Remove that install (it would
+# compete for the SMTP port). Its uninstaller keeps user data, which the new
+# app migrates to its own folder on first start.
+!define LEGACY_DIR "$LOCALAPPDATA\Programs\LocalMail"
+!macro mkmaillab.removeLegacy
+    IfFileExists "${LEGACY_DIR}\uninstall.exe" 0 +5
+        nsExec::Exec 'taskkill /F /IM "localmail.exe"'
+        ExecWait '"${LEGACY_DIR}\uninstall.exe" /S _?=${LEGACY_DIR}'
+        Delete "${LEGACY_DIR}\uninstall.exe"
+        RMDir "${LEGACY_DIR}"
 !macroend
 
 Function .onInit
@@ -98,7 +110,8 @@ Section
 
     !insertmacro wails.webview2runtime
 
-    !insertmacro localmail.closeRunning
+    !insertmacro mkmaillab.removeLegacy
+    !insertmacro mkmaillab.closeRunning
 
     SetOutPath $INSTDIR
     
@@ -116,9 +129,9 @@ SectionEnd
 Section "uninstall" 
     !insertmacro wails.setShellContext
 
-    !insertmacro localmail.closeRunning
+    !insertmacro mkmaillab.closeRunning
 
-    # Captured emails and settings in %LOCALAPPDATA%\LocalMail are kept on
+    # Captured emails and settings in %LOCALAPPDATA%\MKMailLab are kept on
     # purpose; delete that folder manually for a completely clean removal.
 
     RMDir /r "$AppData\${PRODUCT_EXECUTABLE}" # Remove the WebView2 DataPath

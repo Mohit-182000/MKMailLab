@@ -5,7 +5,7 @@ package brand
 
 const (
 	// Name is the human-facing product name.
-	Name = "LocalMail"
+	Name = "MKMailLab"
 
 	// Description is the short product description used in window titles,
 	// installers and the About screen.
@@ -13,22 +13,29 @@ const (
 
 	// AppID is the reverse-DNS identifier. It is used for the single-instance
 	// lock and must stay stable across releases.
-	AppID = "dev.localmail.app"
+	AppID = "dev.mkmaillab.app"
 
 	// AppUserModelID identifies the app to the Windows shell (taskbar grouping,
 	// toast notifications). The installer's Start Menu shortcut must use the
 	// same value.
-	AppUserModelID = "LocalMail.LocalMail"
+	AppUserModelID = "MKMailLab.MKMailLab"
 
 	// DataDirName is the folder created under %LOCALAPPDATA%.
-	DataDirName = "LocalMail"
+	DataDirName = "MKMailLab"
 
 	// ExecutableName is the base name of the built binary (without .exe).
-	ExecutableName = "localmail"
+	ExecutableName = "mkmaillab"
 
 	// PortableMarker is the file name that, when present next to the
 	// executable, switches the app into portable mode.
-	PortableMarker = "localmail.portable"
+	PortableMarker = "mkmaillab.portable"
+)
+
+// Previous product identity ("LocalMail"). Used once to carry existing data
+// over to the new data directory after the rename.
+const (
+	LegacyDataDirName    = "LocalMail"
+	LegacyExecutableName = "localmail"
 )
 
 // Version and Commit are overridden at build time via

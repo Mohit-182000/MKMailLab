@@ -1,4 +1,4 @@
-// Package testmail sends a test email through LocalMail's own SMTP server,
+// Package testmail sends a test email through MKMailLab's own SMTP server,
 // exercising the same path a real application would.
 package testmail
 
@@ -70,7 +70,7 @@ func Send(ctx context.Context, target Target, m Message) error {
 	}
 	defer c.Close()
 
-	if err := c.Hello("localmail-test"); err != nil {
+	if err := c.Hello("mkmaillab-test"); err != nil {
 		return err
 	}
 	if target.Username != "" {
@@ -110,7 +110,7 @@ func Build(from *mail.Address, to []*mail.Address, m Message, now time.Time) []b
 	}
 	subject := m.Subject
 	if strings.TrimSpace(subject) == "" {
-		subject = "LocalMail test email"
+		subject = "MKMailLab test email"
 	}
 	contentType := "text/plain; charset=utf-8"
 	if m.IsHTML {
@@ -121,11 +121,11 @@ func Build(from *mail.Address, to []*mail.Address, m Message, now time.Time) []b
 	fmt.Fprintf(&b, "To: %s\r\n", strings.Join(addrs, ", "))
 	fmt.Fprintf(&b, "Subject: %s\r\n", mime.QEncoding.Encode("utf-8", subject))
 	fmt.Fprintf(&b, "Date: %s\r\n", now.Format(time.RFC1123Z))
-	fmt.Fprintf(&b, "Message-ID: <%s@localmail.local>\r\n", randomID())
+	fmt.Fprintf(&b, "Message-ID: <%s@mkmaillab.local>\r\n", randomID())
 	b.WriteString("MIME-Version: 1.0\r\n")
 	fmt.Fprintf(&b, "Content-Type: %s\r\n", contentType)
 	b.WriteString("Content-Transfer-Encoding: quoted-printable\r\n")
-	b.WriteString("X-Mailer: LocalMail test sender\r\n\r\n")
+	b.WriteString("X-Mailer: MKMailLab test sender\r\n\r\n")
 
 	qp := quotedprintable.NewWriter(&b)
 	_, _ = qp.Write([]byte(m.Body))

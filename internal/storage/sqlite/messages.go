@@ -40,19 +40,21 @@ func (db *DB) InsertMessage(ctx context.Context, m *domain.NewMessage) (int64, e
 
 	var id int64
 	err = db.withTx(ctx, func(tx *sql.Tx) error {
-		res, err := tx.ExecContext(ctx, `INSERT INTO emails (
-			message_id, subject, from_name, from_addr, to_json, envelope_from, date_header,
+		// Monotonic IDs (never reused, even after deleting everything).
+		if err := tx.QueryRowContext(ctx,
+			`UPDATE id_sequence SET value = value + 1 WHERE name = 'emails' RETURNING value`).Scan(&id); err != nil {
+			return fmt.Errorf("allocate id: %w", err)
+		}
+		_, err := tx.ExecContext(ctx, `INSERT INTO emails (
+			id, message_id, subject, from_name, from_addr, to_json, envelope_from, date_header,
 			received_at, size_bytes, has_html, has_text, attachment_count, snippet,
 			is_read, is_starred, remote_addr, helo, parse_status, parse_errors_json
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-			m.MessageID, m.Subject, m.From.Name, m.From.Address, string(toJSON), m.EnvelopeFrom, dateHeader,
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+			id, m.MessageID, m.Subject, m.From.Name, m.From.Address, string(toJSON), m.EnvelopeFrom, dateHeader,
 			m.ReceivedAt.UnixMilli(), m.Size, m.HTML != "", m.Text != "", len(m.Attachments), m.Snippet,
 			m.IsRead, m.IsStarred, m.RemoteAddr, m.Helo, string(status), string(errsJSON))
 		if err != nil {
 			return fmt.Errorf("insert email: %w", err)
-		}
-		if id, err = res.LastInsertId(); err != nil {
-			return err
 		}
 
 		if _, err := tx.ExecContext(ctx, `INSERT INTO email_bodies (email_id, text_body, html_body) VALUES (?,?,?)`,

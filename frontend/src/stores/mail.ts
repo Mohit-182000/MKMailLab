@@ -24,6 +24,10 @@ export const useMailStore = defineStore('mail', () => {
   const detailState = ref<LoadState>('idle')
   /** Bumped on every arrival so the UI can play a subtle highlight. */
   const lastArrivalId = ref<number | null>(null)
+  /** Multi-selection (checkboxes) for bulk actions, independent of the open email. */
+  const checked = ref<number[]>([])
+  const checkedSet = computed(() => new Set(checked.value))
+  let lastCheckedId: number | null = null
 
   const hasMore = computed(() => cursor.value !== '')
   const isFiltered = computed(() => search.value.trim() !== '' || unreadOnly.value)
@@ -56,6 +60,7 @@ export const useMailStore = defineStore('mail', () => {
       })
       if (token !== listToken) return // a newer request superseded this one
       items.value = page.items ?? []
+      checked.value = checked.value.filter((id) => items.value.some((m) => m.id === id))
       total.value = page.total
       unread.value = page.unread
       cursor.value = page.nextCursor
@@ -153,7 +158,9 @@ export const useMailStore = defineStore('mail', () => {
       const neighbour = items.value[idx + 1] ?? items.value[idx - 1]
       void select(neighbour ? neighbour.id : null)
     }
-    await act((b) => b.mail.delete([id]), 'Could not delete email')
+    if (await act((b) => b.mail.delete([id]), 'Could not delete email')) {
+      useToastStore().success('Email deleted')
+    }
   }
 
   async function clearAll() {
@@ -180,11 +187,67 @@ export const useMailStore = defineStore('mail', () => {
     }
   }
 
-  async function act(fn: (b: Awaited<ReturnType<typeof getBackend>>) => Promise<void>, failTitle: string) {
+  // --- multi-select -----------------------------------------------------------
+
+  /** Toggles a checkbox; with range=true selects everything since the last click (Shift+click). */
+  function toggleCheck(id: number, range = false): void {
+    if (range && lastCheckedId !== null) {
+      const a = items.value.findIndex((m) => m.id === lastCheckedId)
+      const b = items.value.findIndex((m) => m.id === id)
+      if (a >= 0 && b >= 0) {
+        const [from, to] = a < b ? [a, b] : [b, a]
+        const ids = new Set(checked.value)
+        for (const m of items.value.slice(from, to + 1)) ids.add(m.id)
+        checked.value = [...ids]
+        lastCheckedId = id
+        return
+      }
+    }
+    checked.value = checkedSet.value.has(id) ? checked.value.filter((x) => x !== id) : [...checked.value, id]
+    lastCheckedId = id
+  }
+
+  function checkAll(): void {
+    checked.value = items.value.map((m) => m.id)
+  }
+
+  function clearChecks(): void {
+    checked.value = []
+    lastCheckedId = null
+  }
+
+  async function deleteChecked(): Promise<void> {
+    const ids = [...checked.value]
+    if (ids.length === 0) return
+    if (selectedId.value !== null && ids.includes(selectedId.value)) {
+      const remaining = items.value.filter((m) => !ids.includes(m.id))
+      const idx = items.value.findIndex((m) => m.id === selectedId.value)
+      const neighbour = remaining.find((m) => items.value.indexOf(m) > idx) ?? remaining[remaining.length - 1]
+      void select(neighbour ? neighbour.id : null)
+    }
+    clearChecks()
+    if (await act((b) => b.mail.delete(ids), 'Could not delete emails')) {
+      useToastStore().success(ids.length === 1 ? 'Email deleted' : `${ids.length} emails deleted`)
+    }
+  }
+
+  async function setReadChecked(read: boolean): Promise<void> {
+    const ids = [...checked.value]
+    if (ids.length) await act((b) => b.mail.setRead(ids, read), 'Could not update emails')
+  }
+
+  async function setStarredChecked(starred: boolean): Promise<void> {
+    const ids = [...checked.value]
+    if (ids.length) await act((b) => b.mail.setStarred(ids, starred), 'Could not update emails')
+  }
+
+  async function act(fn: (b: Awaited<ReturnType<typeof getBackend>>) => Promise<void>, failTitle: string): Promise<boolean> {
     try {
       await fn(await getBackend())
+      return true
     } catch (err) {
       useToastStore().error(failTitle, errorMessage(err))
+      return false
     }
   }
 
@@ -229,10 +292,12 @@ export const useMailStore = defineStore('mail', () => {
       }
       case ChangeKind.ChangeDeleted:
         items.value = items.value.filter((m) => !ids.has(m.id))
+        checked.value = checked.value.filter((id) => !ids.has(id))
         if (selectedId.value !== null && ids.has(selectedId.value)) void select(null)
         break
       case ChangeKind.ChangeCleared:
         items.value = []
+        clearChecks()
         cursor.value = ''
         void select(null)
         break
@@ -263,9 +328,10 @@ export const useMailStore = defineStore('mail', () => {
 
   return {
     items, total, unread, inboxUnread, cursor, search, unreadOnly, listState, loadingMore,
-    selectedId, selected, detailState, lastArrivalId, hasMore, isFiltered,
+    selectedId, selected, detailState, lastArrivalId, hasMore, isFiltered, checked, checkedSet,
     init, load, loadMore, setSearch, setUnreadOnly, select, selectAdjacent,
     setRead, toggleStar, remove, clearAll, saveRaw, saveAttachment,
+    toggleCheck, checkAll, clearChecks, deleteChecked, setReadChecked, setStarredChecked,
     // exposed for tests
     onReceived, onChanged,
   }

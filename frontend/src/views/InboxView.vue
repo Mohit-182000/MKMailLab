@@ -18,7 +18,13 @@ function onKey(e: KeyboardEvent) {
     list.value?.focusSearch()
     return
   }
-  if (isTyping(e) || e.ctrlKey || e.metaKey || e.altKey) return
+  if (isTyping(e)) return
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+    e.preventDefault()
+    mail.checkAll()
+    return
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return
   const id = mail.selectedId
   switch (e.key) {
     case 'ArrowDown':
@@ -33,10 +39,16 @@ function onKey(e: KeyboardEvent) {
       mail.selectAdjacent(-1)
       break
     case 'Escape':
-      void mail.select(null)
+      if (mail.checked.length > 0) mail.clearChecks()
+      else void mail.select(null)
       break
     case 'Delete':
-      if (id !== null) void mail.remove(id)
+      if (mail.checked.length > 0) list.value?.bulkDelete()
+      else if (id !== null) void mail.remove(id)
+      break
+    case 'x':
+    case 'X':
+      if (id !== null) mail.toggleCheck(id)
       break
     case 'r':
     case 'R':

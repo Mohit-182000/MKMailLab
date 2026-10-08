@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AuthMode, type SmtpConfig } from '@/types'
-import { buildSnippets, connectionInfo } from './snippets'
+import { SNIPPET_GROUPS, buildSnippets, connectionInfo } from './snippets'
 
 const base: SmtpConfig = {
   host: '127.0.0.1',
@@ -12,6 +12,8 @@ const base: SmtpConfig = {
   maxConnections: 100,
   autoStart: true,
 }
+
+const required: SmtpConfig = { ...base, authMode: AuthMode.AuthRequired, username: 'devuser', password: 's3cret' }
 
 describe('connectionInfo', () => {
   it('hides credentials unless auth is required', () => {
@@ -26,26 +28,58 @@ describe('connectionInfo', () => {
   })
 
   it('includes credentials when required', () => {
-    const c = connectionInfo({ ...base, authMode: AuthMode.AuthRequired, username: 'dev', password: 'p@ss' })
-    expect(c).toMatchObject({ username: 'dev', password: 'p@ss', authRequired: true })
+    expect(connectionInfo(required)).toMatchObject({ username: 'devuser', password: 's3cret', authRequired: true })
   })
 })
 
-describe('buildSnippets', () => {
+describe('buildSnippets catalogue', () => {
+  const noAuthSnippets = buildSnippets(connectionInfo({ ...base, port: 2526 }))
+  const authSnippets = buildSnippets(connectionInfo({ ...required, port: 2526 }))
+
+  it('covers every group with unique ids', () => {
+    const ids = noAuthSnippets.map((s) => s.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    for (const g of SNIPPET_GROUPS) {
+      expect(noAuthSnippets.some((s) => s.group === g), `group ${g} empty`).toBe(true)
+    }
+    expect(noAuthSnippets.length).toBeGreaterThanOrEqual(30)
+  })
+
+  it('every snippet uses the configured port', () => {
+    for (const s of noAuthSnippets) {
+      expect(s.code, s.id).toContain('2526')
+    }
+  })
+
+  it('every snippet that supports auth includes the credentials when required', () => {
+    for (const s of authSnippets.filter((x) => !x.noAuth)) {
+      expect(s.code, s.id).toContain('s3cret')
+      expect(s.code, s.id).toContain('devuser')
+    }
+  })
+
+  it('no snippet leaks placeholder credentials when auth is not required', () => {
+    for (const s of noAuthSnippets) {
+      expect(s.code, s.id).not.toContain('ignored')
+      expect(s.code, s.id).not.toContain('undefined')
+      expect(s.code, s.id).not.toMatch(/\n\n\n/)
+    }
+  })
+
   it('renders Laravel env without credentials', () => {
-    const laravel = buildSnippets(connectionInfo(base)).find((s) => s.id === 'laravel')!
+    const laravel = noAuthSnippets.find((s) => s.id === 'laravel')!
     expect(laravel.code).toContain('MAIL_HOST=127.0.0.1')
-    expect(laravel.code).toContain('MAIL_PORT=1025')
     expect(laravel.code).toContain('MAIL_USERNAME=null')
   })
 
   it('escapes credentials per language', () => {
-    const snippets = buildSnippets(
-      connectionInfo({ ...base, authMode: AuthMode.AuthRequired, username: 'dev', password: 'p@ss"x' }),
+    const tricky = buildSnippets(
+      connectionInfo({ ...base, authMode: AuthMode.AuthRequired, username: 'dev', password: `p@ss"x'y` }),
     )
-    const php = snippets.find((s) => s.id === 'php')!
-    expect(php.code).toBe('MAILER_DSN=smtp://dev:p%40ss%22x@127.0.0.1:1025')
-    const node = snippets.find((s) => s.id === 'node')!
-    expect(node.code).toContain('auth: { user: "dev", pass: "p@ss\\"x" }')
+    const byId = (id: string) => tricky.find((s) => s.id === id)!.code
+    expect(byId('symfony')).toBe("MAILER_DSN=smtp://dev:p%40ss%22x'y@127.0.0.1:1025")
+    expect(byId('node')).toContain(`auth: { user: "dev", pass: "p@ss\\"x'y" }`)
+    expect(byId('phpmailer')).toContain(`$mail->Password = 'p@ss"x\\'y';`)
+    expect(byId('python')).toContain(`smtp.login('dev', 'p@ss"x\\'y')`)
   })
 })

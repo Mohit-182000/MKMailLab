@@ -11,8 +11,8 @@ import (
 // RotatingFile is an io.WriteCloser that rolls the file over once it exceeds
 // MaxBytes, keeping at most Keep previous files:
 //
-//	localmail.log  (current)
-//	localmail.1.log (newest backup) … localmail.N.log (oldest)
+//	mkmaillab.log  (current)
+//	mkmaillab.1.log (newest backup) … mkmaillab.N.log (oldest)
 //
 // Rotation closes the file before renaming, which Windows requires.
 type RotatingFile struct {

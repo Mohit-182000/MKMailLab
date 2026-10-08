@@ -5,19 +5,19 @@
 !include "FileFunc.nsh"
 
 !ifndef INFO_PROJECTNAME
-    !define INFO_PROJECTNAME "localmail"
+    !define INFO_PROJECTNAME "mkmaillab"
 !endif
 !ifndef INFO_COMPANYNAME
-    !define INFO_COMPANYNAME "LocalMail"
+    !define INFO_COMPANYNAME "MKMailLab"
 !endif
 !ifndef INFO_PRODUCTNAME
-    !define INFO_PRODUCTNAME "LocalMail"
+    !define INFO_PRODUCTNAME "MKMailLab"
 !endif
 !ifndef INFO_PRODUCTVERSION
     !define INFO_PRODUCTVERSION "0.1.0"
 !endif
 !ifndef INFO_COPYRIGHT
-    !define INFO_COPYRIGHT "(c) 2026 LocalMail"
+    !define INFO_COPYRIGHT "(c) 2026 MKMailLab"
 !endif
 !ifndef PRODUCT_EXECUTABLE
     !define PRODUCT_EXECUTABLE "${INFO_PROJECTNAME}.exe"

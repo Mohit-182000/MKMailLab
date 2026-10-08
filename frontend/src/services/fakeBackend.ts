@@ -98,15 +98,15 @@ export class FakeBackend implements Backend {
 
   system = {
     getAppInfo: async (): Promise<AppInfo> => ({
-      name: 'LocalMail',
+      name: 'MKMailLab',
       version: '0.0.0-test',
       commit: 'test',
       dev: true,
       portable: false,
       dataDir: 'C:\\data',
-      databasePath: 'C:\\data\\localmail.db',
+      databasePath: 'C:\\data\\mkmaillab.db',
       logDir: 'C:\\data\\logs',
-      logFile: 'C:\\data\\logs\\localmail.log',
+      logFile: 'C:\\data\\logs\\mkmaillab.log',
       startedAt: 0,
       goVersion: 'go',
       platform: 'windows/amd64',

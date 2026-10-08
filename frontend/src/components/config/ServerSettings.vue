@@ -90,7 +90,7 @@ async function restoreDefaults() {
 
       <div v-if="exposed" class="flex gap-2 rounded-md border border-warning/30 bg-warning-soft px-3 py-2 text-xs">
         <TriangleAlert class="mt-px size-3.5 shrink-0 text-warning" />
-        <span>Other computers on your network will be able to send email to LocalMail. Use <code class="font-mono">127.0.0.1</code> unless you need this.</span>
+        <span>Other computers on your network will be able to send email to MKMailLab. Use <code class="font-mono">127.0.0.1</code> unless you need this.</span>
       </div>
 
       <fieldset>
@@ -145,7 +145,7 @@ async function restoreDefaults() {
       <label class="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-border px-3 py-2.5">
         <span>
           <span class="block text-xs font-semibold">Start SMTP server automatically</span>
-          <span class="block text-[11px] text-muted">Start listening as soon as LocalMail opens.</span>
+          <span class="block text-[11px] text-muted">Start listening as soon as MKMailLab opens.</span>
         </span>
         <input v-model="form.autoStart" type="checkbox" class="size-4 accent-[var(--lm-accent)]" />
       </label>

@@ -5,11 +5,11 @@ version: '3'
 
 # This information is used to generate the build assets.
 info:
-  companyName: "LocalMail" # The name of the company
-  productName: "LocalMail" # The name of the application
-  productIdentifier: "dev.localmail.app" # The unique product identifier
+  companyName: "MKMailLab" # The name of the company
+  productName: "MKMailLab" # The name of the application
+  productIdentifier: "dev.mkmaillab.app" # The unique product identifier
   description: "Local SMTP email testing tool" # The application description
-  copyright: "(c) 2026 LocalMail" # Copyright text
+  copyright: "(c) 2026 MKMailLab" # Copyright text
   comments: "Captures emails sent by local applications" # Comments
   version: "0.1.0" # The application version
 

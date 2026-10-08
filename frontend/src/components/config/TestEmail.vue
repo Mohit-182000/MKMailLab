@@ -13,9 +13,9 @@ const router = useRouter()
 const sending = ref(false)
 
 const form = ref<TestEmail>({
-  from: 'LocalMail <test@localmail.local>',
+  from: 'MKMailLab <test@mkmaillab.local>',
   to: 'you@example.com',
-  subject: 'Test email from LocalMail',
+  subject: 'Test email from MKMailLab',
   body: '<h2>Hello!</h2>\n<p>If you can read this, your local SMTP server works.</p>',
   isHtml: true,
 })
@@ -38,7 +38,7 @@ async function send() {
   <section class="card">
     <header class="border-b border-border px-5 py-3.5">
       <h2 class="text-sm font-semibold">Send a test email</h2>
-      <p class="mt-0.5 text-xs text-muted">Delivered through LocalMail's own SMTP server to verify it works.</p>
+      <p class="mt-0.5 text-xs text-muted">Delivered through MKMailLab's own SMTP server to verify it works.</p>
     </header>
     <form class="space-y-3 p-5" @submit.prevent="send">
       <div class="grid grid-cols-2 gap-3">

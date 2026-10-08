@@ -16,7 +16,7 @@ describe('app store', () => {
     expect(store.state).toBe('loading')
     await pending
     expect(store.state).toBe('ready')
-    expect(store.info?.name).toBe('LocalMail')
+    expect(store.info?.name).toBe('MKMailLab')
     expect(store.error).toBeNull()
   })
 

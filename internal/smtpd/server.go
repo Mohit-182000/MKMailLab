@@ -1,4 +1,4 @@
-// Package smtpd runs LocalMail's capturing SMTP server on top of
+// Package smtpd runs MKMailLab's capturing SMTP server on top of
 // emersion/go-smtp. It owns the listener lifecycle (start/stop/restart),
 // connection limits, authentication policy and status reporting.
 package smtpd
@@ -260,7 +260,7 @@ func withDefaults(c Config) Config {
 		c.WriteTimeout = 60 * time.Second
 	}
 	if c.Domain == "" {
-		c.Domain = "localmail.local"
+		c.Domain = "mkmaillab.local"
 	}
 	if c.AuthMode == "" {
 		c.AuthMode = AuthAny

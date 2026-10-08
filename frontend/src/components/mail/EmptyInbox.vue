@@ -18,9 +18,9 @@ async function sendTest() {
   sending.value = true
   try {
     await smtp.sendTest({
-      from: 'LocalMail <test@localmail.local>',
+      from: 'MKMailLab <test@mkmaillab.local>',
       to: 'you@example.com',
-      subject: 'Hello from LocalMail 👋',
+      subject: 'Hello from MKMailLab 👋',
       body: '<h2 style="font-family:sans-serif">It works!</h2><p style="font-family:sans-serif">This test email was delivered through your local SMTP server.</p>',
       isHtml: true,
     })

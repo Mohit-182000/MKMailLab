@@ -115,3 +115,58 @@ describe('mail store', () => {
     expect(mail.selectedId).toBe(ids[0])
   })
 })
+
+describe('mail store multi-select', () => {
+  let fake: FakeBackend
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    fake = new FakeBackend()
+    setBackend(fake)
+  })
+
+  it('checks, range-selects and bulk deletes', async () => {
+    for (let i = 0; i < 5; i++) fake.receive()
+    const mail = useMailStore()
+    await mail.init()
+    const ids = mail.items.map((m) => m.id)
+
+    mail.toggleCheck(ids[0]!)
+    mail.toggleCheck(ids[3]!, true) // shift-click: 0..3
+    expect(mail.checked.sort()).toEqual(ids.slice(0, 4).sort())
+
+    mail.toggleCheck(ids[1]!) // untoggle one
+    expect(mail.checked).toHaveLength(3)
+
+    await mail.select(ids[0]!)
+    await mail.deleteChecked()
+    await flushPromises()
+    expect(mail.items.map((m) => m.id)).toEqual([ids[1], ids[4]])
+    expect(mail.checked).toHaveLength(0)
+    expect(mail.selectedId).toBe(ids[1]) // moved to a surviving neighbour
+    expect(fake.messages).toHaveLength(2)
+  })
+
+  it('bulk marks read and stars', async () => {
+    for (let i = 0; i < 3; i++) fake.receive()
+    const mail = useMailStore()
+    await mail.init()
+    mail.checkAll()
+    await mail.setReadChecked(true)
+    await mail.setStarredChecked(true)
+    expect(mail.items.every((m) => m.isRead && m.isStarred)).toBe(true)
+    mail.clearChecks()
+    expect(mail.checked).toHaveLength(0)
+  })
+
+  it('external deletes prune the selection', async () => {
+    const a = fake.receive()
+    fake.receive()
+    const mail = useMailStore()
+    await mail.init()
+    mail.checkAll()
+    await fake.mail.delete([a.id])
+    expect(mail.checked).not.toContain(a.id)
+    expect(mail.checked).toHaveLength(1)
+  })
+})

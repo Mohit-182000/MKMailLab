@@ -5,10 +5,10 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "0.1.0",
-			"CompanyName": "LocalMail",
+			"CompanyName": "MKMailLab",
 			"FileDescription": "Local SMTP email testing tool",
-			"LegalCopyright": "(c) 2026 LocalMail",
-			"ProductName": "LocalMail",
+			"LegalCopyright": "(c) 2026 MKMailLab",
+			"ProductName": "MKMailLab",
 			"Comments": "Local SMTP email testing tool"
 		}
 	}

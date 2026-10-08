@@ -71,7 +71,7 @@ func (db *DB) migrate(ctx context.Context) error {
 		return err
 	}
 	if n := len(migrations); n > 0 && current > migrations[n-1].version {
-		return fmt.Errorf("sqlite: database schema v%d is newer than this app supports (v%d); please update LocalMail", current, migrations[n-1].version)
+		return fmt.Errorf("sqlite: database schema v%d is newer than this app supports (v%d); please update MKMailLab", current, migrations[n-1].version)
 	}
 
 	for _, m := range migrations {

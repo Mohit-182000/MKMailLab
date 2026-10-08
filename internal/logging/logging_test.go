@@ -24,7 +24,7 @@ func TestNewWritesJSONAndRedacts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	data, err := os.ReadFile(filepath.Join(dir, "localmail.log"))
+	data, err := os.ReadFile(filepath.Join(dir, "mkmaillab.log"))
 	if err != nil {
 		t.Fatal(err)
 	}

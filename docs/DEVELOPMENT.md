@@ -27,7 +27,7 @@ Run from the repository root. `wails3 task <name>` runs tasks from
 | Command                     | What it does |
 |-----------------------------|--------------|
 | `wails3 dev`                | Hot-reloading dev build (Go rebuilds on save; Vite HMR for the UI) |
-| `wails3 build`              | Production `bin\localmail.exe` |
+| `wails3 build`              | Production `bin\mkmaillab.exe` |
 | `wails3 task test`          | All Go + frontend tests |
 | `wails3 task test:go`       | Go tests only (`go test ./internal/...`) |
 | `wails3 task test:frontend` | Vitest unit tests |
@@ -43,8 +43,8 @@ Frontend-only (inside `frontend/`): `npm run typecheck`, `npm test`,
 | | Dev (`wails3 dev`) | Production (`wails3 build`) |
 |-|-|-|
 | Build tag | none → `brand.Dev = true` | `production` → `brand.Dev = false` |
-| Data dir | `%LOCALAPPDATA%\LocalMail-Dev` | `%LOCALAPPDATA%\LocalMail` |
-| Single-instance ID | `dev.localmail.app.dev` | `dev.localmail.app` |
+| Data dir | `%LOCALAPPDATA%\MKMailLab-Dev` | `%LOCALAPPDATA%\MKMailLab` |
+| Single-instance ID | `dev.mkmaillab.app.dev` | `dev.mkmaillab.app` |
 | Log level | debug, also to stderr | info, file only |
 | DevTools | enabled (F12) | disabled |
 
@@ -98,4 +98,4 @@ docs/
 - **`EBADENGINE` warnings for `abbrev`/`nopt`** — harmless; they come from a
   CLI helper inside `@vue/test-utils`. Upgrading Node to 24.15+ silences them.
 - **Data from a previous run interferes** — delete
-  `%LOCALAPPDATA%\LocalMail-Dev` (dev) or run with `--data-dir`.
+  `%LOCALAPPDATA%\MKMailLab-Dev` (dev) or run with `--data-dir`.

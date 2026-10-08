@@ -58,7 +58,7 @@ func TestMigrationsAreIdempotent(t *testing.T) {
 			t.Fatal(err)
 		}
 		v, err := db.SchemaVersion(context.Background())
-		if err != nil || v != 1 {
+		if err != nil || v != 2 {
 			t.Fatalf("version = %d, err = %v", v, err)
 		}
 		_ = db.Close()
@@ -214,5 +214,52 @@ func TestSettings(t *testing.T) {
 	v, err := db.GetSetting(ctx, "smtp")
 	if err != nil || v != `{"port":2525}` {
 		t.Fatalf("v=%q err=%v", v, err)
+	}
+}
+
+func TestIDsAreNeverReused(t *testing.T) {
+	db := openTest(t)
+	ctx := context.Background()
+	id1, _ := db.InsertMessage(ctx, sample("a", time.Now()))
+	id2, _ := db.InsertMessage(ctx, sample("b", time.Now()))
+	if _, err := db.DeleteMessages(ctx, []int64{id2}); err != nil {
+		t.Fatal(err)
+	}
+	id3, _ := db.InsertMessage(ctx, sample("c", time.Now()))
+	if _, err := db.DeleteAllMessages(ctx); err != nil {
+		t.Fatal(err)
+	}
+	id4, err := db.InsertMessage(ctx, sample("d", time.Now()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !(id1 < id2 && id2 < id3 && id3 < id4) {
+		t.Fatalf("ids reused or not increasing: %d %d %d %d", id1, id2, id3, id4)
+	}
+}
+
+func TestSequenceSeededFromExistingData(t *testing.T) {
+	// Simulates upgrading a v1 database that already holds messages.
+	path := filepath.Join(t.TempDir(), "up.db")
+	db, err := Open(context.Background(), path, logging.Discard())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.writer.Exec(`DELETE FROM id_sequence; DELETE FROM schema_migrations WHERE version = 2; DROP TABLE id_sequence`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.writer.Exec(`INSERT INTO emails (id, received_at) VALUES (41, 0)`); err != nil {
+		t.Fatal(err)
+	}
+	_ = db.Close()
+
+	db, err = Open(context.Background(), path, logging.Discard()) // re-runs migration 2
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	id, err := db.InsertMessage(context.Background(), sample("next", time.Now()))
+	if err != nil || id != 42 {
+		t.Fatalf("id = %d, err = %v; want 42", id, err)
 	}
 }

@@ -1,4 +1,4 @@
-// Command genicon renders the LocalMail application icon (build/appicon.png)
+// Command genicon renders the MKMailLab application icon (build/appicon.png)
 // from vector shapes using signed distance fields, so it is reproducible and
 // needs no design tools. Run: go run ./scripts/genicon
 package main

@@ -1,4 +1,4 @@
-// Command localmail is the LocalMail desktop application: a local SMTP server
+// Command mkmaillab is the MKMailLab desktop application: a local SMTP server
 // with an inbox UI for inspecting emails sent by applications under
 // development.
 package main
@@ -51,6 +51,14 @@ func run() (code int) {
 	flags := parseFlags(os.Args[1:])
 
 	paths, err := config.ResolveFromEnvironment(flags.dataDir, brand.Dev)
+
+	// One-time carry-over of data from the app's previous name (LocalMail).
+	var legacy config.LegacyMigration
+	var legacyErr error
+	if err == nil && flags.dataDir == "" && !paths.Portable && !brand.Dev {
+		legacy, legacyErr = config.MigrateLegacyData(os.Getenv("LOCALAPPDATA"), paths.Root)
+	}
+
 	if err == nil {
 		err = paths.EnsureDirs()
 	}
@@ -89,6 +97,12 @@ func run() (code int) {
 	log.Info("starting",
 		"version", brand.Version, "commit", brand.Commit, "dev", brand.Dev,
 		"data_dir", paths.Root, "portable", paths.Portable)
+	if legacy.Moved {
+		log.Info("migrated data from previous app name", "from", legacy.From, "to", legacy.To)
+	}
+	if legacyErr != nil {
+		log.Warn("could not migrate data from previous app name; starting fresh", "err", legacyErr)
+	}
 
 	core, err := app.New(context.Background(), app.Options{Paths: paths, Logging: logs})
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 func TestResolve(t *testing.T) {
 	base := t.TempDir()
 	exeDir := filepath.Join(base, "app")
-	exe := filepath.Join(exeDir, "localmail.exe")
+	exe := filepath.Join(exeDir, "mkmaillab.exe")
 	local := filepath.Join(base, "AppData", "Local")
 	marker := filepath.Join(exeDir, brand.PortableMarker)
 
@@ -78,7 +78,7 @@ func TestResolve(t *testing.T) {
 			if got.Portable != tt.wantPortable {
 				t.Errorf("Portable = %v, want %v", got.Portable, tt.wantPortable)
 			}
-			if got.Database != filepath.Join(tt.wantRoot, "localmail.db") {
+			if got.Database != filepath.Join(tt.wantRoot, "mkmaillab.db") {
 				t.Errorf("Database = %q", got.Database)
 			}
 			if got.Logs != filepath.Join(tt.wantRoot, "logs") {

@@ -8,14 +8,14 @@
   IgnorableNamespaces="uap3">
   
   <Identity 
-    Name="dev.localmail.app"
-    Publisher="CN=LocalMail"
+    Name="dev.mkmaillab.app"
+    Publisher="CN=MKMailLab"
     Version="0.1.0.0" 
     ProcessorArchitecture="x64" />
   
   <Properties>
-    <DisplayName>LocalMail</DisplayName>
-    <PublisherDisplayName>LocalMail</PublisherDisplayName>
+    <DisplayName>MKMailLab</DisplayName>
+    <PublisherDisplayName>MKMailLab</PublisherDisplayName>
     <Description>Local SMTP email testing tool</Description>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -29,9 +29,9 @@
   </Resources>
   
   <Applications>
-    <Application Id="dev.localmail.app" Executable="localmail.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="dev.mkmaillab.app" Executable="mkmaillab.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="LocalMail"
+        DisplayName="MKMailLab"
         Description="Local SMTP email testing tool"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
@@ -41,7 +41,7 @@
       </uap:VisualElements>
       
       <Extensions>
-        <desktop:Extension Category="windows.fullTrustProcess" Executable="localmail.exe" />
+        <desktop:Extension Category="windows.fullTrustProcess" Executable="mkmaillab.exe" />
         
         
       </Extensions>

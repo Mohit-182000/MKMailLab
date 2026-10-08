@@ -26,7 +26,7 @@ const ComponentKey = "component"
 // Options configures New.
 type Options struct {
 	Dir          string     // log directory; required
-	FileName     string     // defaults to "localmail.log"
+	FileName     string     // defaults to "mkmaillab.log"
 	MaxFileBytes int64      // defaults to 10 MiB
 	KeepFiles    int        // rotated backups to keep; defaults to 5
 	RingSize     int        // in-memory entries; defaults to 2000
@@ -50,7 +50,7 @@ func New(opts Options) (*Logging, error) {
 		return nil, errors.New("logging: Dir is required")
 	}
 	if opts.FileName == "" {
-		opts.FileName = "localmail.log"
+		opts.FileName = "mkmaillab.log"
 	}
 	if opts.MaxFileBytes <= 0 {
 		opts.MaxFileBytes = 10 << 20

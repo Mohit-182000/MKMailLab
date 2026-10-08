@@ -11,11 +11,11 @@ import (
 )
 
 func TestSystemServiceGetAppInfo(t *testing.T) {
-	paths := config.Paths{Root: `C:\data`, Database: `C:\data\localmail.db`, Logs: `C:\data\logs`, Portable: true}
+	paths := config.Paths{Root: `C:\data`, Database: `C:\data\mkmaillab.db`, Logs: `C:\data\logs`, Portable: true}
 	ring := logging.NewRing(10)
 	started := time.UnixMilli(1_700_000_000_000)
 
-	svc := NewSystemService(paths, `C:\data\logs\localmail.log`, ring, func() time.Time { return started })
+	svc := NewSystemService(paths, `C:\data\logs\mkmaillab.log`, ring, func() time.Time { return started })
 	info := svc.GetAppInfo()
 
 	if info.Name != brand.Name || info.Version != brand.Version {

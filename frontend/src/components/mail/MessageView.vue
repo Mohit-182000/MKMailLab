@@ -8,13 +8,12 @@ import {
   LoaderCircle,
   Mail,
   MailOpen,
-  Monitor,
-  Smartphone,
   Star,
   Trash2,
   TriangleAlert,
 } from 'lucide-vue-next'
 import CopyButton from '@/components/CopyButton.vue'
+import PreviewFrame from './PreviewFrame.vue'
 import { contentUrl } from '@/services/backend'
 import { useMailStore } from '@/stores/mail'
 import { ParseStatus, type Address, type Attachment } from '@/types'
@@ -24,7 +23,6 @@ type Tab = 'preview' | 'text' | 'headers' | 'raw' | 'attachments'
 
 const mail = useMailStore()
 const tab = ref<Tab>('preview')
-const device = ref<'desktop' | 'mobile'>('desktop')
 const raw = ref('')
 const rawState = ref<'idle' | 'loading' | 'ready' | 'error'>('idle')
 
@@ -184,36 +182,7 @@ function isImage(a: Attachment) {
       <!-- Tab content -->
       <div class="min-h-0 flex-1 overflow-hidden">
         <!-- Preview: sandboxed iframe with no permissions (no scripts, no same-origin, no forms, no popups). -->
-        <div v-if="tab === 'preview'" class="flex h-full flex-col">
-          <div class="flex h-9 shrink-0 items-center gap-1 border-b border-border bg-panel px-3">
-            <button
-              class="flex h-6 items-center gap-1 rounded px-2 text-xs"
-              :class="device === 'desktop' ? 'bg-active text-fg' : 'text-muted hover:bg-hover'"
-              @click="device = 'desktop'"
-            >
-              <Monitor class="size-3.5" /> Desktop
-            </button>
-            <button
-              class="flex h-6 items-center gap-1 rounded px-2 text-xs"
-              :class="device === 'mobile' ? 'bg-active text-fg' : 'text-muted hover:bg-hover'"
-              @click="device = 'mobile'"
-            >
-              <Smartphone class="size-3.5" /> Mobile
-            </button>
-            <span class="ml-auto text-[11px] text-faint">Scripts are disabled in previews</span>
-          </div>
-          <div class="flex min-h-0 flex-1 justify-center overflow-auto p-4" :class="device === 'mobile' ? 'bg-panel-2' : ''">
-            <iframe
-              :key="m.id"
-              :src="contentUrl.html(m.id)"
-              sandbox=""
-              referrerpolicy="no-referrer"
-              title="Email preview"
-              class="h-full rounded-md border border-border bg-white transition-[width] duration-200"
-              :class="device === 'mobile' ? 'w-[390px] shadow-pop' : 'w-full'"
-            />
-          </div>
-        </div>
+        <PreviewFrame v-if="tab === 'preview'" :src="contentUrl.html(m.id)" :message-id="m.id" />
 
         <div v-else-if="tab === 'text'" class="h-full overflow-auto p-6">
           <pre v-if="m.text" class="font-mono text-[12.5px] leading-relaxed break-words whitespace-pre-wrap select-text">{{ m.text }}</pre>

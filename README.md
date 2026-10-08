@@ -1,11 +1,11 @@
-# LocalMail
+# MKMailLab
 
 A local SMTP server and inbox for developers. Point your application's mail
 settings at `127.0.0.1:1025`, send an email, and inspect it instantly —
 rendered HTML, plain text, headers, raw MIME and attachments — without any
 email ever leaving your machine.
 
-LocalMail is a native Windows desktop application (Go + Wails + Vue 3). It
+MKMailLab is a native Windows desktop application (Go + Wails + Vue 3). It
 needs no PHP, Node.js, Docker or database server on the user's machine.
 
 > **Status:** usable MVP — SMTP capture, inbox, preview, configuration and a
@@ -15,15 +15,15 @@ needs no PHP, Node.js, Docker or database server on the user's machine.
 ## Install
 
 1. Build the installer (or use one already built): `wails3 task package` →
-   `bin\LocalMail-Setup-0.1.0.exe`
-2. Run it. It installs per-user into `%LOCALAPPDATA%\Programs\LocalMail`
+   `bin\MKMailLab-Setup-0.1.0.exe`
+2. Run it. It installs per-user into `%LOCALAPPDATA%\Programs\MKMailLab`
    (no admin rights), adds Start Menu and desktop shortcuts and an entry in
    *Settings → Apps* for uninstalling.
-3. Open **LocalMail**. The SMTP server starts automatically on
+3. Open **MKMailLab**. The SMTP server starts automatically on
    `127.0.0.1:1025`.
 
-Silent install: `LocalMail-Setup-0.1.0.exe /S`. Uninstalling keeps your
-captured emails in `%LOCALAPPDATA%\LocalMail`.
+Silent install: `MKMailLab-Setup-0.1.0.exe /S`. Uninstalling keeps your
+captured emails in `%LOCALAPPDATA%\MKMailLab`.
 
 ## Using it
 
@@ -69,16 +69,16 @@ MAIL_PASSWORD=null
 MAIL_ENCRYPTION=null
 ```
 
-## Where LocalMail keeps data
+## Where MKMailLab keeps data
 
 | Mode                                   | Location                          |
 |----------------------------------------|-----------------------------------|
-| Installed                              | `%LOCALAPPDATA%\LocalMail\`       |
-| Development build (`wails3 dev`)       | `%LOCALAPPDATA%\LocalMail-Dev\`   |
-| Portable (`localmail.portable` beside the exe) | `.\data\` next to the exe |
-| Custom                                 | `localmail.exe --data-dir <path>` |
+| Installed                              | `%LOCALAPPDATA%\MKMailLab\`       |
+| Development build (`wails3 dev`)       | `%LOCALAPPDATA%\MKMailLab-Dev\`   |
+| Portable (`mkmaillab.portable` beside the exe) | `.\data\` next to the exe |
+| Custom                                 | `mkmaillab.exe --data-dir <path>` |
 
-Inside: `localmail.db` (SQLite), `logs\localmail.log` (rotated JSON logs),
+Inside: `mkmaillab.db` (SQLite), `logs\mkmaillab.log` (rotated JSON logs),
 `certs\` (TLS), `tmp\` (cleared at startup).
 
 ## Command-line flags

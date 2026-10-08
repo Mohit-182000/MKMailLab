@@ -28,7 +28,7 @@ const themeLabel = computed(() => `Theme: ${theme.preference.value} (click to ch
             <path d="m4 7 8 6 8-6" />
           </svg>
         </div>
-        <span class="text-[14px] font-semibold tracking-tight">LocalMail</span>
+        <span class="text-[14px] font-semibold tracking-tight">MKMailLab</span>
       </div>
 
       <nav class="flex h-full items-stretch gap-1" aria-label="Main">

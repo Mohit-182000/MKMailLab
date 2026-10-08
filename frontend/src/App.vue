@@ -18,7 +18,7 @@ onMounted(async () => {
   try {
     await Promise.all([app.load(), smtp.init(), mail.init()])
   } catch (err) {
-    useToastStore().error('LocalMail failed to initialise', errorMessage(err))
+    useToastStore().error('MKMailLab failed to initialise', errorMessage(err))
   }
 })
 </script>

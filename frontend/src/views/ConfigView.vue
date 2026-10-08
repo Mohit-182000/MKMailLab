@@ -59,7 +59,7 @@ const statusText = computed(() => {
       </div>
 
       <p v-if="app.info" class="pb-2 text-center text-[11px] text-faint select-text">
-        LocalMail {{ app.info.version }} · Data: {{ app.info.dataDir }}
+        MKMailLab {{ app.info.version }} · Data: {{ app.info.dataDir }}
       </p>
     </div>
   </div>
