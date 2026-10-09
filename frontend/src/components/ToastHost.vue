@@ -8,10 +8,11 @@ const toast = useToastStore()
 <template>
   <div class="pointer-events-none fixed right-4 bottom-4 z-50 flex w-80 flex-col gap-2" aria-live="polite">
     <TransitionGroup
-      enter-active-class="transition duration-150 ease-out"
-      enter-from-class="translate-y-2 opacity-0"
-      leave-active-class="transition duration-100 ease-in"
-      leave-to-class="opacity-0"
+      enter-active-class="transition duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      enter-from-class="translate-x-8 opacity-0"
+      leave-active-class="transition duration-150 ease-in absolute"
+      leave-to-class="translate-x-8 opacity-0"
+      move-class="transition duration-200"
     >
       <div
         v-for="t in toast.toasts"

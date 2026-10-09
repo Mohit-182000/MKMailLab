@@ -40,6 +40,7 @@ export class FakeBackend implements Backend {
     activeSessions: 0,
   }
   clipboard = ''
+  opened: string[] = []
   calls: string[] = []
   private listeners = new Map<string, Set<Listener>>()
   private nextId = 1
@@ -94,6 +95,10 @@ export class FakeBackend implements Backend {
 
   async copyText(text: string) {
     this.clipboard = text
+  }
+
+  async openExternal(url: string) {
+    this.opened.push(url)
   }
 
   system = {

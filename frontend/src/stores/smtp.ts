@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { getBackend } from '@/services/backend'
 import type { SaveResult, SmtpConfig, SmtpStatus, TestEmail } from '@/types'
 import { errorMessage } from '@/utils/errors'
@@ -19,6 +19,17 @@ export const useSmtpStore = defineStore('smtp', () => {
     config.value ? connectionInfo(config.value, running.value ? status.value?.port : undefined) : null,
   )
 
+  // Announce connect/disconnect transitions (button, settings save or backend event).
+  // The first status after launch is the baseline, not a transition.
+  let baselined = false
+  watch(running, (now, before) => {
+    if (!baselined || !status.value || now === before) return
+    const toast = useToastStore()
+    if (now) toast.success('SMTP connected', `Listening on ${status.value.host}:${status.value.port}`)
+    else if (!status.value.error) toast.info('SMTP disconnected', 'The server has stopped accepting mail')
+    else toast.error('SMTP disconnected', status.value.error)
+  }, { flush: 'sync' })
+
   async function init(): Promise<void> {
     const backend = await getBackend()
     unsubscribe?.()
@@ -28,6 +39,7 @@ export const useSmtpStore = defineStore('smtp', () => {
     const [s, c] = await Promise.all([backend.smtp.getStatus(), backend.smtp.getConfig()])
     status.value = s
     config.value = c
+    baselined = true
   }
 
   async function start(): Promise<void> {

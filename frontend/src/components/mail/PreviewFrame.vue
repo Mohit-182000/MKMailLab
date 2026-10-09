@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { MonitorSmartphone } from 'lucide-vue-next'
+import { getBackend } from '@/services/backend'
 import { DEVICE_PRESETS, clampWidth, frameLayout } from '@/utils/devices'
 
 const props = defineProps<{ src: string; messageId: number }>()
@@ -76,6 +77,19 @@ function setCustom(e: Event) {
   }
 }
 
+const EXTERNAL = /^(https?|mailto|tel):/i
+
+// The frame is same-origin but script-less (sandbox="allow-same-origin"), so
+// the host can intercept link clicks and hand them to the default browser.
+function hookLinks(e: Event) {
+  const doc = (e.target as HTMLIFrameElement).contentDocument
+  doc?.addEventListener('click', (ev) => {
+    const a = (ev.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href]')
+    if (!a) return
+    ev.preventDefault()
+    if (EXTERNAL.test(a.href)) void getBackend().then((b) => b.openExternal(a.href))
+  })
+}
 </script>
 
 <template>
@@ -149,9 +163,10 @@ function setCustom(e: Event) {
         <iframe
           :key="messageId"
           :src="src"
-          sandbox=""
+          sandbox="allow-same-origin"
           referrerpolicy="no-referrer"
           title="Email preview"
+          @load="hookLinks"
           class="block size-full bg-white"
           :class="targetWidth ? 'border-x border-border shadow-pop' : ''"
         />

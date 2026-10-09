@@ -95,6 +95,12 @@ body,
   height: 100%;
 }
 
+/* Toasts slide in from beyond the right edge; never let that create a scrollbar. */
+html,
+body {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background: var(--lm-bg);
@@ -149,4 +155,23 @@ body {
   .kbd {
     @apply rounded border border-border bg-panel-2 px-1 font-mono text-[10px] text-muted;
   }
+}
+
+/* App-wide motion: launch fade-in, view changes, toast slide-in. */
+@keyframes lm-app-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes lm-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.lm-app-enter { animation: lm-app-in 450ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.lm-header-enter { animation: lm-rise 400ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.lm-view-enter-active { transition: opacity 180ms ease, transform 180ms ease; }
+.lm-view-enter-from { opacity: 0; transform: translateY(6px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-app-enter, .lm-header-enter { animation: none; }
+  .lm-view-enter-active { transition: none; }
 }

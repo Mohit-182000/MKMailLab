@@ -1,4 +1,4 @@
-import { Clipboard, Events } from '@wailsio/runtime'
+import { Browser, Clipboard, Events } from '@wailsio/runtime'
 import { MailService, SMTPService, SystemService } from '#bindings/localmail/internal/bridge'
 import type { Backend, BackendEvents } from './backend'
 
@@ -34,5 +34,6 @@ export function createWailsBackend(): Backend {
     copyText: async (text) => {
       await Clipboard.SetText(text)
     },
+    openExternal: (url) => Browser.OpenURL(url),
   }
 }

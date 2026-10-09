@@ -19,8 +19,8 @@ const themeLabel = computed(() => `Theme: ${theme.preference.value} (click to ch
 </script>
 
 <template>
-  <div class="flex h-full flex-col">
-    <header class="flex h-13 shrink-0 items-center gap-6 border-b border-border bg-panel px-4">
+  <div class="lm-app-enter flex h-full flex-col">
+    <header class="lm-header-enter flex h-13 shrink-0 items-center gap-6 border-b border-border bg-panel px-4">
       <div class="flex items-center gap-2.5">
         <div class="flex size-7 items-center justify-center rounded-md bg-accent text-accent-fg">
           <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -60,7 +60,11 @@ const themeLabel = computed(() => `Theme: ${theme.preference.value} (click to ch
     </header>
 
     <main class="min-h-0 flex-1">
-      <RouterView />
+      <RouterView v-slot="{ Component, route }">
+        <Transition name="lm-view" mode="out-in">
+          <component :is="Component" :key="route.path" class="h-full" />
+        </Transition>
+      </RouterView>
     </main>
 
     <ToastHost />

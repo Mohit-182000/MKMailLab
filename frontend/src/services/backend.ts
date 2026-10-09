@@ -52,6 +52,8 @@ export interface Backend {
   on<K extends keyof BackendEvents>(event: K, cb: (data: BackendEvents[K]) => void): () => void
   /** Copies text to the system clipboard. */
   copyText(text: string): Promise<void>
+  /** Opens a URL in the user's default browser. */
+  openExternal(url: string): Promise<void>
 }
 
 let current: Backend | null = null
